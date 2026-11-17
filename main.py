@@ -6,9 +6,8 @@ def fitur_anggota_2():
     # TODO: dikerjakan oleh Anggota 2
     pass
 
-def fitur_ketua():
-    # TODO: dikerjakan oleh Ketua
-    pass
+def fitur_ketua(sisi):
+    return sisi * sisi
 
 def main():
     print("Selamat datang di Project Akhir APD!")
