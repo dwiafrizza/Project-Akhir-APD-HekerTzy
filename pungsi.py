@@ -191,25 +191,22 @@ def cek_nama_duplikat(nama_baru, data_hero):
     return False
 
 def filter_hero(role, lane, data_hero):
-    # 1. Anggap semua hero lolos di awal
     hasil = set(data_hero.keys())
-    
-    # 2. Proses Filter berdasarkan Role
-    if role != "all":
+
+    if role != "All":
         role_cocok = set()
         for key, value in data_hero.items():
-            if role in value[1].lower():
+            if role in value[1]:
                 role_cocok.add(key)
         hasil = hasil.intersection(role_cocok)
-        
-    # 3. Proses Filter berdasarkan Lane
-    if lane != "all":
+
+    if lane != "All":
         lane_cocok = set()
         for key, value in data_hero.items():
-            if lane in value[2].lower():
+            if lane in value[2]:
                 lane_cocok.add(key)
         hasil = hasil.intersection(lane_cocok)
-        
+
     return hasil
 
 def tampilkan_hero_filter(role_filter, lane_filter):
@@ -226,7 +223,6 @@ def tampilkan_hero_filter(role_filter, lane_filter):
 
 def tambah_data_hero(nomor, data_baru):
     data_hero[nomor] = data_baru
-    return True
 
 def cari_key_hapus(nama_target):
     for key, value in data_hero.items():
