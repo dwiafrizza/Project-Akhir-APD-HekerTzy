@@ -1,6 +1,10 @@
 import inquirer
 import pungsi as p
 
+role_valid = ("Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank")
+lane_valid = ("EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane")
+pilihan_ya = ("y", "ya")
+
 def menu_admin():
     while p.current_role == "admin":
         print('='*44)
@@ -84,19 +88,38 @@ def menu_admin():
             key_target = p.cari_key_hapus(nama_edit)
             
             if key_target != False:
-                print('='*44)            
+                nama_lama, role_lama, lane_lama, damage_lama, tahun_lama = p.data_hero[key_target]
+                print('='*44)
+                print("Data lama:", nama_lama, "|", role_lama, "|", lane_lama, "|", damage_lama, "|", tahun_lama)
+                print('='*44)
+
                 nama_baru = input("Nama baru: ")
-                role_baru = input("Role baru: ")
-                lane_baru = input("Lane baru: ")
+
+                while True:
+                    role_baru = input("Role baru: ").strip().title()
+                    role_benar = True
+                    for r in role_baru.split("/"):
+                        if r not in role_valid:
+                            role_benar = False
+                    if role_benar:
+                        break
+                    print("Role tidak valid! Pilihan:", role_valid)
+
+
+                while True:
+                    lane_baru = input("Lane baru: ").strip()
+                    if lane_baru in lane_valid:
+                        break
+                    print("Lane tidak valid! Pilihan:", lane_valid)
+
                 damage_baru = input("Tipe damage baru: ")
                 
-                # Tahun rilis dikunci/tidak boleh diganti, diambil otomatis dari data lama
-                tahun_lama = p.data_hero[key_target][4]
+
                 print(f"Tahun Rilis tetap (tidak dapat diubah): {tahun_lama}")
                 
-                list_update = [nama_baru, role_baru, lane_baru, damage_baru, tahun_lama]
+                tuple_update = (nama_baru, role_baru, lane_baru, damage_baru, tahun_lama)
                 
-                p.edit_data_hero(key_target, list_update)
+                p.edit_data_hero(key_target, tuple_update)
                 print('='*44)
                 print("Data hero berhasil diperbarui!")
             else:
@@ -117,18 +140,26 @@ def menu_admin():
             key_target = p.cari_key_hapus(nama_hapus)
             
             if key_target != False:
-                nama_target = p.data_hero[key_target][0]
-                del p.data_hero[key_target]
+                nama_target, role_target, lane_target, damage_target, tahun_target = p.data_hero[key_target]
                 print('='*44)
-                print("Sukses menghapus data:", nama_target)
-                
-                # Merapikan kembali key dictionary agar urut dari 1 secara otomatis
-                urut_data = {}
-                key_ulang = 1
-                for key in p.data_hero.keys():
-                    urut_data[key_ulang] = p.data_hero[key]
-                    key_ulang += 1
-                p.data_hero = urut_data
+                print("Hero yang dipilih:", nama_target, "|", role_target, "|", lane_target)
+                yakin = input("Yakin ingin menghapus? (y/n): ").lower()
+
+
+                if yakin in pilihan_ya:
+                    del p.data_hero[key_target]
+                    print('='*44)
+                    print("Sukses menghapus data:", nama_target)
+                    
+                    urut_data = {}
+                    key_ulang = 1
+                    for key in p.data_hero.keys():
+                        urut_data[key_ulang] = p.data_hero[key]
+                        key_ulang += 1
+                    p.data_hero = urut_data
+                else:
+                    print('='*44)
+                    print("Penghapusan dibatalkan.")
             else:
                 print('='*44)
                 print("Gagal! Nama hero tidak ditemukan.")
