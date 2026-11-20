@@ -1,6 +1,9 @@
 import os
 from prettytable import PrettyTable 
 import inquirer
+login = False
+loginuser = False
+loginadmin = False
 
 daftar_admin = [
     ["Rawr", "2112"],

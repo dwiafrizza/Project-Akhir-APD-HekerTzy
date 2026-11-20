@@ -2,7 +2,7 @@ import inquirer
 import pungsi as p
 
 def menu_user():
-    while p.current_role == "user":
+    while p.loginuser == True:
         p.bersihkan_layar()
         print('='*44)
         print('='*16, 'MENU USER', '='*17)
@@ -28,7 +28,7 @@ def menu_user():
             print('='*44)
             hasil = input("Kembali ke menu? (y/n): ")
             if hasil.lower() == "n":
-                p.current_role = None
+                p.loginuser = False
                 break
             p.bersihkan_layar()
 
@@ -66,10 +66,10 @@ def menu_user():
             
             hasil = input("Kembali ke menu? (y/n): ")
             if hasil.lower() == "n":
-                p.current_role = None
+                p.loginuser = False
                 break
             p.bersihkan_layar()
 
         else:
-            p.current_role = None
+            p.loginuser = False
             break
