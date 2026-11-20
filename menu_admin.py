@@ -6,7 +6,6 @@ def menu_admin():
         print('='*44)
         print('='*16, 'MENU ADMIN', '='*16)
         print('='*44)
-        
         tanya_menu = [
             inquirer.List(
                 "pilihan",
@@ -16,7 +15,7 @@ def menu_admin():
                     "2. Melihat Daftar Data Hero", 
                     "3. Mengedit Data Hero",
                     "4. Menghapus Data Hero", 
-                    "5. Cari Hero Berdasarkan Filter",
+                    "5. Mencari Data Hero",
                     "6. Keluar"
                 ],
             )
@@ -29,7 +28,7 @@ def menu_admin():
             p.tampilkan_seluruh_hero()
             print('='*44)
             hasil = input("Kembali ke menu? (y/n): ")
-            if hasil.lower() == "n":
+            if hasil == "n":
                 p.current_role = None
                 break
             p.bersihkan_layar()
@@ -38,12 +37,12 @@ def menu_admin():
             p.bersihkan_layar()
             print('='*22, 'TAMBAH DATA HERO', '='*22)
             print('='*62)
+            p.tampilkan_seluruh_hero()
             print(f"Jumlah Hero Saat ini adalah {len(p.data_hero)}")
-            
-            # Validasi Nama Hero menggunakan fungsi cek_nama_duplikat dari set pungsi.py
+
             while True:
-                nama_input = input("Masukkan Nama Hero: ").strip()
-                if not nama_input:
+                nama_input = input("Masukkan Nama Hero: ")
+                if nama_input == "":
                     print("Nama hero tidak boleh kosong!")
                     continue
                 
@@ -52,26 +51,26 @@ def menu_admin():
                 else:
                     break
             
-            role_input = input("Masukkan Role Hero: ")
-            lane_input = input("Masukkan Lane Hero: ")
-            damage_input = input("Masukkan Tipe Damage: ")
+            role = input("Masukkan Role Hero: ")
+            lane = input("Masukkan Lane Hero: ")
+            damage = input("Masukkan Tipe Damage: ")
+            
             try:
-                tahun_input = input("Masukkan Tahun Rilis: ")
-                tahun_input = int(tahun_input) 
+                tahun = int(input("Masukkan Tahun Rilis: "))
             except ValueError:
-                print("Tahun harus berupa angka integer!")
+                print("Tahun harus berupa bilangan bulat!")
                 input("Tekan enter untuk kembali...")
                 p.bersihkan_layar()
                 continue
                 
-            nomor_baru = max(p.data_hero.keys()) + 1 if p.data_hero else 1
-            list_baru = [nama_input, role_input, lane_input, damage_input, str(tahun_input)]
+            nomor_baru = max(p.data_hero.keys()) + 1
+            list_baru = [nama_input, role, lane, damage, str(tahun)]
             
             p.tambah_data_hero(nomor_baru, list_baru)
             print('='*44)
             print("Data hero berhasil ditambahkan.")
             hasil = input("Kembali ke menu? (y/n): ")
-            if hasil.lower() == "n":
+            if hasil == "n":
                 p.current_role = None
                 break
             p.bersihkan_layar()
@@ -141,11 +140,10 @@ def menu_admin():
 
         elif "5." in menu:
             p.bersihkan_layar()
-            print('='*22, 'FILTER DATA HERO', '='*22)
+            print('='*22, 'CARI DATA HERO', '='*22)
             
-            # Menggunakan set unik dari pungsi.py untuk pilihan list inquirer
             daftar_role = ["Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank", "All"]
-            daftar_lane = ["EXP", "Gold", "Jungle", "Roam", "Mid", "All"]
+            daftar_lane = ["EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane", "All"]
             tanya_role = [
                 inquirer.List(
                     "role",
@@ -154,7 +152,7 @@ def menu_admin():
                 )
             ]
             jawab_role = inquirer.prompt(tanya_role)
-            pilih_role = jawab_role["role"].lower()
+            pilih_role = jawab_role["role"]
             
             tanya_lane = [
                 inquirer.List(
@@ -164,15 +162,14 @@ def menu_admin():
                 )
             ]
             jawab_lane = inquirer.prompt(tanya_lane)
-            pilih_lane = jawab_lane["lane"].lower()
+            pilih_lane = jawab_lane["lane"]
             
             p.bersihkan_layar()
-            print(f"Hasil Filter -> Role: {jawab_role['role']} | Lane: {jawab_lane['lane']}\n")
             p.tampilkan_hero_filter(pilih_role, pilih_lane)
             print('='*44)
             
             hasil = input("Kembali ke menu? (y/n): ")
-            if hasil.lower() == "n":
+            if hasil == "n":
                 p.current_role = None
                 break
             p.bersihkan_layar()
