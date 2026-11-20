@@ -2,7 +2,7 @@ import inquirer
 import pungsi as p
 
 def menu_admin():
-    while p.current_role == "admin":
+   while p.loginadmin == True:
         print('='*44)
         print('='*16, 'MENU ADMIN', '='*16)
         print('='*44)
@@ -30,7 +30,7 @@ def menu_admin():
             print('='*44)
             hasil = input("Kembali ke menu? (y/n): ")
             if hasil.lower() == "n":
-                p.current_role = None
+                p.loginadmin = False
                 break
             p.bersihkan_layar()
 
@@ -72,7 +72,7 @@ def menu_admin():
             print("Data hero berhasil ditambahkan.")
             hasil = input("Kembali ke menu? (y/n): ")
             if hasil.lower() == "n":
-                p.current_role = None
+                p.loginadmin = False
                 break
             p.bersihkan_layar()
             
@@ -105,7 +105,7 @@ def menu_admin():
                 
             hasil = input("Kembali ke menu? (y/n): ")
             if hasil.lower() == "n":
-                p.current_role = None
+                p.loginadmin = False
                 break
             p.bersihkan_layar()
 
@@ -121,8 +121,7 @@ def menu_admin():
                 del p.data_hero[key_target]
                 print('='*44)
                 print("Sukses menghapus data:", nama_target)
-                
-                # Merapikan kembali key dictionary agar urut dari 1 secara otomatis
+                          
                 urut_data = {}
                 key_ulang = 1
                 for key in p.data_hero.keys():
@@ -135,7 +134,7 @@ def menu_admin():
                 
             hasil = input("Kembali ke menu? (y/n): ")
             if hasil.lower() == "n":
-                p.current_role = None
+                p.loginadmin = False
                 break
             p.bersihkan_layar()
 
@@ -173,10 +172,10 @@ def menu_admin():
             
             hasil = input("Kembali ke menu? (y/n): ")
             if hasil.lower() == "n":
-                p.current_role = None
+                p.loginadmin = False
                 break
             p.bersihkan_layar()
 
         else:
-            p.current_role = None
+            p.loginadmin = False
             break
