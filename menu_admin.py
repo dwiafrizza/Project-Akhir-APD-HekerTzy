@@ -1,10 +1,12 @@
 import inquirer
 import pungsi as p
-
+ 
 role_valid = ("Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank")
 lane_valid = ("EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane")
+damage_valid = ("Physical", "Magic", "True")
 pilihan_ya = ("y", "ya")
-
+pilihan_jawab = ("y", "ya", "n", "tidak")
+ 
 def menu_admin():
     while p.current_role == "admin":
         print('='*44)
@@ -37,7 +39,7 @@ def menu_admin():
                 p.current_role = None
                 break
             p.bersihkan_layar()
-
+ 
         elif "1." in menu:
             p.bersihkan_layar()
             print('='*22, 'TAMBAH DATA HERO', '='*22)
@@ -92,29 +94,28 @@ def menu_admin():
                 print('='*44)
                 print("Data lama:", nama_lama, "|", role_lama, "|", lane_lama, "|", damage_lama, "|", tahun_lama)
                 print('='*44)
-
+ 
                 nama_baru = input("Nama baru: ")
-
-                while True:
-                    role_baru = input("Role baru: ").strip().title()
-                    role_benar = True
-                    for r in role_baru.split("/"):
-                        if r not in role_valid:
-                            role_benar = False
-                    if role_benar:
-                        break
-                    print("Role tidak valid! Pilihan:", role_valid)
-
-
-                while True:
-                    lane_baru = input("Lane baru: ").strip()
-                    if lane_baru in lane_valid:
-                        break
-                    print("Lane tidak valid! Pilihan:", lane_valid)
-
-                damage_baru = input("Tipe damage baru: ")
+ 
+                role_baru = p.cek_validasi("Role baru: ", role_valid)
+                role_tambah = input("Tambah role kedua? (y/n): ").lower()
+                if role_tambah in pilihan_ya:
+                    role_kedua = p.cek_validasi("Role kedua: ", role_valid)
+                    role_baru = role_baru + "/" + role_kedua
+ 
+                lane_baru = p.cek_validasi("Lane baru: ", lane_valid)
+                lane_tambah = input("Tambah lane kedua? (y/n): ").lower()
+                if lane_tambah in pilihan_ya:
+                    lane_kedua = p.cek_validasi("Lane kedua: ", lane_valid)
+                    lane_baru = lane_baru + "/" + lane_kedua
+ 
+                damage_baru = p.cek_validasi("Tipe damage baru: ", damage_valid)
+                damage_tambah = input("Tambah tipe damage kedua? (y/n): ").lower()
+                if damage_tambah in pilihan_ya:
+                    damage_kedua = p.cek_validasi("Tipe damage kedua: ", damage_valid)
+                    damage_baru = damage_baru + "/" + damage_kedua
                 
-
+ 
                 print(f"Tahun Rilis tetap (tidak dapat diubah): {tahun_lama}")
                 
                 tuple_update = (nama_baru, role_baru, lane_baru, damage_baru, tahun_lama)
@@ -131,7 +132,7 @@ def menu_admin():
                 p.current_role = None
                 break
             p.bersihkan_layar()
-
+ 
         elif "4." in menu:
             p.bersihkan_layar()
             p.tampilkan_seluruh_hero()
@@ -143,9 +144,9 @@ def menu_admin():
                 nama_target, role_target, lane_target, damage_target, tahun_target = p.data_hero[key_target]
                 print('='*44)
                 print("Hero yang dipilih:", nama_target, "|", role_target, "|", lane_target)
-                yakin = input("Yakin ingin menghapus? (y/n): ").lower()
-
-
+                yakin = p.cek_validasi("Yakin ingin menghapus? (y/n): ", pilihan_jawab)
+ 
+ 
                 if yakin in pilihan_ya:
                     del p.data_hero[key_target]
                     print('='*44)
@@ -169,7 +170,7 @@ def menu_admin():
                 p.current_role = None
                 break
             p.bersihkan_layar()
-
+ 
         elif "5." in menu:
             p.bersihkan_layar()
             print('='*22, 'FILTER DATA HERO', '='*22)
@@ -207,7 +208,8 @@ def menu_admin():
                 p.current_role = None
                 break
             p.bersihkan_layar()
-
+ 
         else:
             p.current_role = None
             break
+ 
