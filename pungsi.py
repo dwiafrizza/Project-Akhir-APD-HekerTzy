@@ -1,14 +1,13 @@
 import os
 from prettytable import PrettyTable 
-import inquirer
 login = False
 loginuser = False
 loginadmin = False
 
 daftar_admin = [
-    ["Rawr", "2112"],
-    ["AdminDua", "password123"],
-    ["AdminTiga", "secret456"]
+    ["Rizki", "007"],
+    ["Surya", "002"],
+    ["Rizal", "001"]
 ]
 
 username = 'Rizki' 

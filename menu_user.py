@@ -14,7 +14,7 @@ def menu_user():
                 message="Masukkan Pilihan",
                 choices=[
                     "1. Melihat Daftar Data Hero", 
-                    "2. Cari Hero Berdasarkan Filter", 
+                    "2. Searching Data Hero", 
                     "3. Keluar"
                 ],
             )
@@ -34,39 +34,35 @@ def menu_user():
 
         elif "2." in menu:
             p.bersihkan_layar()
-            print('='*22, 'FILTER DATA HERO', '='*22)
-            
-            daftar_role = ["Assassin", "Mage", "Marksman", "Fighter", "Tank", "Support", "All"]
-            daftar_lane = ["Gold Lane", "EXP Lane", "Mid Lane", "Jungler", "Roamer", "All"]
+            print('='*22, 'CARI DATA HERO', '='*22)
             
             tanya_role = [
                 inquirer.List(
                     "role",
                     message="Pilih Role Hero",
-                    choices=daftar_role,
+                    choices= list(p.role_valid) + ["All"],
                 )
             ]
             jawab_role = inquirer.prompt(tanya_role)
-            pilih_role = jawab_role["role"].lower()
+            pilih_role = jawab_role["role"]
             
             tanya_lane = [
                 inquirer.List(
                     "lane",
                     message="Pilih Lane Hero",
-                    choices=daftar_lane,
+                    choices=list(p.lane_valid) + ["All"],
                 )
             ]
             jawab_lane = inquirer.prompt(tanya_lane)
-            pilih_lane = jawab_lane["lane"].lower()
+            pilih_lane = jawab_lane["lane"]
             
             p.bersihkan_layar()
-            print(f"Hasil Filter -> Role: {jawab_role['role']} | Lane: {jawab_lane['lane']}\n")
             p.tampilkan_hero_filter(pilih_role, pilih_lane)
             print('='*44)
             
             hasil = input("Kembali ke menu? (y/n): ")
             if hasil.lower() == "n":
-                p.loginuser = False
+                p.loginadmin = False
                 break
             p.bersihkan_layar()
 

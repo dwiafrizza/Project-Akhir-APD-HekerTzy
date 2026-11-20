@@ -9,6 +9,7 @@ pilihan_jawab = ("y", "ya", "n", "tidak")
  
 def menu_admin():
    while p.loginadmin == True:
+        p.bersihkan_layar()
         print('='*44)
         print('='*16, 'MENU ADMIN', '='*16)
         print('='*44)
@@ -174,13 +175,11 @@ def menu_admin():
             p.bersihkan_layar()
             print('='*22, 'CARI DATA HERO', '='*22)
             
-            daftar_role = ["Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank", "All"]
-            daftar_lane = ["EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane", "All"]
             tanya_role = [
                 inquirer.List(
                     "role",
                     message="Pilih Role Hero",
-                    choices=daftar_role,
+                    choices= list(role_valid) + ["All"],
                 )
             ]
             jawab_role = inquirer.prompt(tanya_role)
@@ -190,7 +189,7 @@ def menu_admin():
                 inquirer.List(
                     "lane",
                     message="Pilih Lane Hero",
-                    choices=daftar_lane,
+                    choices=list(lane_valid) + ["All"],
                 )
             ]
             jawab_lane = inquirer.prompt(tanya_lane)

@@ -3,15 +3,12 @@ import pungsi as p
 from menu_admin import menu_admin
 from menu_user import menu_user
 
-# data akun user yang sudah register (isinya [username, password])
 data_akun = []
 
-# data akun admin bawaan (dicocokkan sesuai indeks)
-username_admin = ["Rawr", "AdminDua", "AdminTiga"]
-password_admin = ["2112", "password123", "secret456"]
+username_admin = ["Rizki", "Surya", "Rizal"]
+password_admin = ["007", "002", "001"]
 p.bersihkan_layar()
 
-# perulangan utama, berhenti kalau sudah login atau pilih keluar
 while p.login != True:
     print("=" * 22, "Selamat datang!", "=" * 22)
     tanya_awal = [
@@ -35,24 +32,20 @@ while p.login != True:
             username = input("Buat Username: ")
             password = input("Buat Password: ")
 
-            # cek apakah password bisa diubah jadi angka
             try:
                 int(password)
                 password_angka = True
             except ValueError:
                 password_angka = False
 
-            # cek tipe data username (teks) dan password (angka)
             if type(username) != str or password_angka == False:
                 print("Username harus berupa teks dan password harus berupa angka!")
                 continue
 
-            # cek kosong
             if username == "" or password == "":
                 print("Username dan Password tidak boleh kosong!")
                 continue
 
-            # cek username sudah ada atau belum
             sudah_ada = False
             for akun in data_akun:
                 if akun[0] == username:
@@ -62,7 +55,6 @@ while p.login != True:
                 print("Username sudah terdaftar!")
                 continue
 
-            # kalau semua aman, simpan ke list data_akun
             data_akun.append([username, password])
             print("Register berhasil! Silakan login kembali.")
             input("Tekan Enter untuk melanjutkan...")
@@ -79,7 +71,6 @@ while p.login != True:
             usn_login = input("Masukkan Username: ")
             pw_login = input("Masukkan Password: ")
 
-            # cek akun user dulu
             user_cocok = False
             for akun in data_akun:
                 if usn_login == akun[0] and pw_login == akun[1]:
@@ -91,14 +82,12 @@ while p.login != True:
                 login2 = True
                 p.login = True
             else:
-                # kalau bukan user, cek akun admin
                 admin_cocok = False
                 for i in range(len(username_admin)):
                     if usn_login == username_admin[i] and pw_login == password_admin[i]:
                         admin_cocok = True
 
                 if admin_cocok == True:
-                    print("Selamat Datang Admin")
                     p.login = True
                     login2 = True
                     p.loginadmin = True
@@ -108,7 +97,6 @@ while p.login != True:
                     p.bersihkan_layar()
                     break  # balik ke menu awal
 
-        # masuk ke menu sesuai peran
         if p.loginadmin == True:
             menu_admin()
         elif p.loginuser == True:
