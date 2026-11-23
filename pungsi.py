@@ -15,6 +15,15 @@ password = '123'
 
 current_role = None
 
+role_valid = ("Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank")
+lane_valid = ("EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane")
+damage_valid = ("Physical", "Magic", "True")
+pilihan_ya = ("y", "ya")
+pilihan_jawab = ("y", "ya", "n", "tidak")
+
+akun_login = ""     
+hero_favorit = {}   
+
 data_hero = {
     1: ["Miya", "Marksman", "Gold Lane", "Physical", "2016"],
     2: ["Balmond", "Fighter", "EXP Lane/Jungle", "Physical", "2016"],
@@ -166,10 +175,9 @@ def tampilkan_seluruh_hero():
 
 def buat_set_username():
     set_usn = set()
-    # Masukkan admin
     for adm in daftar_admin:
         set_usn.add(adm[0].lower())
-    # Masukkan user biasa yang aktif saat ini
+
     if username:
         set_usn.add(username.lower())
     return set_usn
@@ -234,4 +242,44 @@ def cari_key_hapus(nama_target):
 
 def edit_data_hero(key, data_update):
     data_hero[key] = tuple(data_update)
+    return True
+
+def ambil_favorit():
+    if akun_login not in hero_favorit:
+        hero_favorit[akun_login] = set()
+    return hero_favorit[akun_login]
+
+def tambah_favorit(nama_hero):
+    key = cari_key_hapus(nama_hero)
+    if key is False:
+        return "tidak_ada"
+    nama_asli = data_hero[key][0].lower()
+    favorit = ambil_favorit()
+    if nama_asli in favorit:
+        return "sudah_ada"
+    favorit.add(nama_asli)
+    return "berhasil"
+
+def hapus_favorit(nama_hero):
+    favorit = ambil_favorit()
+    nama_cari = nama_hero.strip().lower()
+    if nama_cari in favorit:
+        favorit.remove(nama_cari)
+        return True
+    return False
+
+def tampilkan_favorit():
+    favorit = ambil_favorit()
+    tabel = PrettyTable()
+    tabel.field_names = ["No", "Nama Hero", "Role", "Lane", "Tipe Damage", "Tahun Rilis"]
+    nomor = 1
+    for value in data_hero.values():
+        if value[0].lower() in favorit:
+            tabel.add_row([nomor, value[0], value[1], value[2], value[3], value[4]])
+            nomor += 1
+    if nomor == 1:
+        print("Daftar hero favorit masih kosong!")
+        return False
+    tabel.align["Nama Hero"] = "l"
+    print(tabel)
     return True
