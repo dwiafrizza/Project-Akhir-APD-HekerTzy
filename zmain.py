@@ -23,10 +23,10 @@ while p.login != True:
      break
     pilihan = jawab_awal["pilihan_awal"]
 
-    # ---------- REGISTER ----------
     if "2." in pilihan:
         p.bersihkan_layar()
         print("=" * 22, "LAMAN REGISTER", "=" * 22)
+        
 
         while True:
             username = input("Buat Username: ")
@@ -61,7 +61,6 @@ while p.login != True:
             p.bersihkan_layar()
             break
 
-    # ---------- LOGIN ----------
     elif "1." in pilihan:
         p.bersihkan_layar()
         print("=" * 22, "LOGIN", "=" * 22)
@@ -79,6 +78,7 @@ while p.login != True:
             if user_cocok == True:
                 print("Login berhasil!")
                 p.loginuser = True
+                p.akun_login = usn_login 
                 login2 = True
                 p.login = True
             else:
@@ -95,13 +95,11 @@ while p.login != True:
                     print("Username atau Password salah atau tidak terdaftar! Silakan coba lagi.")
                     input("Tekan Enter untuk melanjutkan...")
                     p.bersihkan_layar()
-                    break  # balik ke menu awal
-
+                    break 
         if p.loginadmin == True:
             menu_admin()
         elif p.loginuser == True:
             menu_user()
 
-    # ---------- KELUAR ----------
     else:
         break
