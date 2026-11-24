@@ -4,9 +4,8 @@ from menu_admin import menu_admin
 from menu_user import menu_user
 
 data_akun = []
+batas_percobaan = 3
 
-username_admin = ["Rizki", "Surya", "Rizal"]
-password_admin = ["007", "002", "001"]
 p.bersihkan_layar()
 
 while p.login != True:
@@ -20,39 +19,74 @@ while p.login != True:
     ]
     jawab_awal = inquirer.prompt(tanya_awal)
     if jawab_awal == None:
-     break
+        break
     pilihan = jawab_awal["pilihan_awal"]
 
+    # ---------- REGISTER ----------
     if "2." in pilihan:
-        p.bersihkan_layar()
-        print("=" * 22, "LAMAN REGISTER", "=" * 22)
-        
-
         while True:
+            p.bersihkan_layar()
+            print("=" * 22, "LAMAN REGISTER", "=" * 22)
+            print("Ketik 0 pada username untuk kembali ke menu awal.")
+
             username = input("Buat Username: ")
-            password = input("Buat Password: ")
 
-            try:
-                int(password)
-                password_angka = True
-            except ValueError:
-                password_angka = False
+            if username == "0":
+                p.bersihkan_layar()
+                break
 
-            if type(username) != str or password_angka == False:
-                print("Username harus berupa teks dan password harus berupa angka!")
+            # 1. Cek username langsung setelah diinput
+            if username == "":
+                print("Username tidak boleh kosong!")
+                input("Tekan Enter untuk mengulang...")
                 continue
 
-            if username == "" or password == "":
-                print("Username dan Password tidak boleh kosong!")
+            if username.isdigit():
+                print("Username harus berupa teks, tidak boleh angka saja!")
+                input("Tekan Enter untuk mengulang...")
                 continue
 
             sudah_ada = False
+            for adm in p.daftar_admin:
+                if username.lower() == adm[0].lower():
+                    sudah_ada = True
             for akun in data_akun:
-                if akun[0] == username:
+                if username.lower() == akun[0].lower():
                     sudah_ada = True
 
             if sudah_ada == True:
                 print("Username sudah terdaftar!")
+                input("Tekan Enter untuk mengulang...")
+                continue
+
+            # 2. Baru minta password setelah username lolos
+            tanya_pw = [inquirer.Password("password", message="Buat Password")]
+            jawab_pw = inquirer.prompt(tanya_pw)
+            if jawab_pw == None:
+                p.bersihkan_layar()
+                break
+            password = jawab_pw["password"]
+
+            if password == "":
+                print("Password tidak boleh kosong!")
+                input("Tekan Enter untuk mengulang...")
+                continue
+
+            if not password.isdigit():
+                print("Password harus berupa angka!")
+                input("Tekan Enter untuk mengulang...")
+                continue
+
+            # 3. Konfirmasi password
+            tanya_konfirmasi = [inquirer.Password("konfirmasi", message="Ulangi Password")]
+            jawab_konfirmasi = inquirer.prompt(tanya_konfirmasi)
+            if jawab_konfirmasi == None:
+                p.bersihkan_layar()
+                break
+
+            if jawab_konfirmasi["konfirmasi"] != password:
+                print("Konfirmasi password tidak sama!")
+                input("Tekan Enter untuk mengulang...")
                 continue
 
             data_akun.append([username, password])
@@ -61,45 +95,68 @@ while p.login != True:
             p.bersihkan_layar()
             break
 
+    # ---------- LOGIN ----------
     elif "1." in pilihan:
-        p.bersihkan_layar()
-        print("=" * 22, "LOGIN", "=" * 22)
+        percobaan = 0
 
-        login2 = False
-        while login2 != True:
+        while p.login != True and percobaan < batas_percobaan:
+            p.bersihkan_layar()
+            print("=" * 22, "LOGIN", "=" * 22)
+            print(f"Percobaan ke-{percobaan + 1} dari {batas_percobaan}")
+
             usn_login = input("Masukkan Username: ")
-            pw_login = input("Masukkan Password: ")
+            tanya_pw = [inquirer.Password("password", message="Masukkan Password")]
+            jawab_pw = inquirer.prompt(tanya_pw)
+            if jawab_pw == None:
+                break
+            pw_login = jawab_pw["password"]
 
-            user_cocok = False
+            username_ada = False
+
+            # Cek akun user (username tidak membedakan huruf besar/kecil)
             for akun in data_akun:
-                if usn_login == akun[0] and pw_login == akun[1]:
-                    user_cocok = True
+                if usn_login.lower() == akun[0].lower():
+                    username_ada = True
+                    if pw_login == akun[1]:
+                        p.loginuser = True
+                        p.akun_login = akun[0]
+                        p.login = True
 
-            if user_cocok == True:
+            # Cek akun admin
+            if p.login != True:
+                for adm in p.daftar_admin:
+                    if usn_login.lower() == adm[0].lower():
+                        username_ada = True
+                        if pw_login == adm[1]:
+                            p.loginadmin = True
+                            p.login = True
+
+            if p.login == True:
                 print("Login berhasil!")
-                p.loginuser = True
-                p.akun_login = usn_login 
-                login2 = True
-                p.login = True
+                input("Tekan Enter untuk melanjutkan...")
             else:
-                admin_cocok = False
-                for i in range(len(username_admin)):
-                    if usn_login == username_admin[i] and pw_login == password_admin[i]:
-                        admin_cocok = True
-
-                if admin_cocok == True:
-                    p.login = True
-                    login2 = True
-                    p.loginadmin = True
+                percobaan += 1
+                if username_ada == True:
+                    print("Password salah!")
                 else:
-                    print("Username atau Password salah atau tidak terdaftar! Silakan coba lagi.")
-                    input("Tekan Enter untuk melanjutkan...")
-                    p.bersihkan_layar()
-                    break 
+                    print("Akun belum terdaftar!")
+                input("Tekan Enter untuk melanjutkan...")
+
         if p.loginadmin == True:
             menu_admin()
         elif p.loginuser == True:
             menu_user()
+        elif percobaan >= batas_percobaan:
+            print("Percobaan login habis. Kembali ke menu awal.")
+            input("Tekan Enter untuk melanjutkan...")
 
+        # Reset status supaya kembali ke menu awal setelah logout
+        p.login = False
+        p.loginadmin = False
+        p.loginuser = False
+        p.akun_login = ""
+        p.bersihkan_layar()
+
+    # ---------- KELUAR ----------
     else:
         break
