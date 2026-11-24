@@ -61,6 +61,11 @@ def menu_user():
             p.tampilkan_hero_filter(pilih_role, pilih_lane)
             print('='*44) 
 
+            if p.kembali_menu() == False:
+                p.loginuser = False
+                break
+            p.bersihkan_layar()
+
         elif "3." in menu:
             p.bersihkan_layar()
             print('='*10, 'BANDINGKAN DAN REKOMENDASI HERO', '='*10)
@@ -71,33 +76,7 @@ def menu_user():
             p.bandingkan_hero(hero1, hero2)
             print('='*52)
 
-            print("Sekarang pilih kriteria untuk rekomendasi hero")
-            tanya_rekom = [
-                inquirer.List(
-                    "role",
-                    message="Pilih Role Hero",
-                    choices=list(p.role_valid) + ["All"],
-                ),
-                inquirer.List(
-                    "lane",
-                    message="Pilih Lane Hero",
-                    choices=list(p.lane_valid) + ["All"],
-                ),
-                inquirer.List(
-                    "damage",
-                    message="Pilih Tipe Damage",
-                    choices=list(p.damage_valid) + ["All"],
-                )
-            ]
-            jawab_rekom = inquirer.prompt(tanya_rekom)
-            p.rekomendasi_hero(jawab_rekom["role"], jawab_rekom["lane"], jawab_rekom["damage"])
-            print('='*52)
-
             if p.kembali_menu() == False:
                 p.loginuser = False
                 break
             p.bersihkan_layar()
-
-        else:
-            p.loginuser = False
-            break
