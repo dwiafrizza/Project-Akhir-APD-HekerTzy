@@ -1,6 +1,4 @@
 import os
-import random
-import inquirer
 from prettytable import PrettyTable 
 login = False
 loginuser = False
@@ -16,9 +14,6 @@ username = 'Rizki'
 password = '123'   
 
 current_role = None
-role_valid = ("Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank")
-lane_valid = ("EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane")
-damage_valid = ("Physical", "Magic", "True")
 
 role_valid = ("Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank")
 lane_valid = ("EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane")
@@ -169,20 +164,6 @@ def cek_validasi(pesan, daftar_valid):
             if inputan.lower() == pilihan.lower():
                 return pilihan
         print("Input tidak valid! Pilihan:", daftar_valid)
-
-def kembali_menu():
-    tanya = [
-        inquirer.List(
-            "kembali",
-            message="Kembali ke menu?",
-            choices=["Ya", "Tidak"],
-        )
-    ]
-    jawab = inquirer.prompt(tanya)
-    if jawab["kembali"] == "Ya":
-        return True
-    else:
-        return False
 
 def tampilkan_seluruh_hero():
     tabel = PrettyTable()
