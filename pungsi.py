@@ -1,4 +1,6 @@
 import os
+import random
+import inquirer
 from prettytable import PrettyTable 
 login = False
 loginuser = False
@@ -14,6 +16,9 @@ username = 'Rizki'
 password = '123'   
 
 current_role = None
+role_valid = ("Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank")
+lane_valid = ("EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane")
+damage_valid = ("Physical", "Magic", "True")
 
 data_hero = {
     1: ["Miya", "Marksman", "Gold Lane", "Physical", "2016"],
@@ -156,6 +161,20 @@ def cek_validasi(pesan, daftar_valid):
                 return pilihan
         print("Input tidak valid! Pilihan:", daftar_valid)
 
+def kembali_menu():
+    tanya = [
+        inquirer.List(
+            "kembali",
+            message="Kembali ke menu?",
+            choices=["Ya", "Tidak"],
+        )
+    ]
+    jawab = inquirer.prompt(tanya)
+    if jawab["kembali"] == "Ya":
+        return True
+    else:
+        return False
+
 def tampilkan_seluruh_hero():
     tabel = PrettyTable()
     tabel.field_names = ["No", "Nama Hero", "Role", "Lane", "Tipe Damage", "Tahun Rilis"]
@@ -234,4 +253,55 @@ def cari_key_hapus(nama_target):
 
 def edit_data_hero(key, data_update):
     data_hero[key] = tuple(data_update)
+    return True
+
+def bandingkan_hero(nama1, nama2):
+    key1 = cari_key_hapus(nama1)
+    key2 = cari_key_hapus(nama2)
+
+    if key1 == False or key2 == False:
+        print("Salah satu hero tidak ditemukan!")
+        return
+    if key1 == key2:
+        print("Pilih dua hero yang berbeda!")
+        return
+
+    hero1 = data_hero[key1]
+    hero2 = data_hero[key2]
+
+    tabel = PrettyTable()
+    tabel.field_names = ["Atribut", hero1[0], hero2[0]]
+    tabel.add_row(["Role", hero1[1], hero2[1]])
+    tabel.add_row(["Lane", hero1[2], hero2[2]])
+    tabel.add_row(["Tipe Damage", hero1[3], hero2[3]])
+    tabel.add_row(["Tahun Rilis", hero1[4], hero2[4]])
+    print(tabel)
+
+    if int(hero1[4]) < int(hero2[4]):
+        print(hero1[0], "lebih dulu rilis dibanding", hero2[0])
+    elif int(hero1[4]) > int(hero2[4]):
+        print(hero2[0], "lebih dulu rilis dibanding", hero1[0])
+    else:
+        print("Kedua hero rilis di tahun yang sama")
+
+def rekomendasi_hero(role, lane, damage):
+    hasil_key = filter_hero(role, lane, data_hero)
+    cocok = []
+    for key in sorted(hasil_key):
+        if damage == "All" or damage in data_hero[key][3]:
+            cocok.append(key)
+
+    if len(cocok) == 0:
+        print("Tidak ada hero yang cocok dengan pilihanmu!")
+        return
+
+    tabel = PrettyTable()
+    tabel.field_names = ["No", "Nama Hero", "Role", "Lane", "Tipe Damage", "Tahun Rilis"]
+    for key in cocok:
+        tabel.add_row([key, data_hero[key][0], data_hero[key][1], data_hero[key][2], data_hero[key][3], data_hero[key][4]])
+    tabel.align["Nama Hero"] = "l"
+    print(tabel)
+
+    pilihan = random.choice(cocok)
+    print("Hero yang kami rekomendasikan:", data_hero[pilihan][0])
     return True

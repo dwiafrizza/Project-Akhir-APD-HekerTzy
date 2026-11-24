@@ -34,11 +34,11 @@ def menu_admin():
             p.bersihkan_layar()
             p.tampilkan_seluruh_hero()
             print('='*44)
-            hasil = input("Kembali ke menu? (y/n): ")
-            if hasil.lower() == "n":
+            if p.kembali_menu() == False:
                 p.loginadmin = False
                 break
             p.bersihkan_layar()
+ 
  
         elif "1." in menu:
             p.bersihkan_layar()
@@ -76,11 +76,11 @@ def menu_admin():
             p.tambah_data_hero(nomor_baru, list_baru)
             print('='*44)
             print("Data hero berhasil ditambahkan.")
-            hasil = input("Kembali ke menu? (y/n): ")
-            if hasil.lower() == "n":
+            if p.kembali_menu() == False:
                 p.loginadmin = False
                 break
             p.bersihkan_layar()
+ 
             
         elif "3." in menu: 
             p.bersihkan_layar()
@@ -127,11 +127,11 @@ def menu_admin():
                 print('='*44)
                 print("Gagal! Nama hero tidak ditemukan.")
                 
-            hasil = input("Kembali ke menu? (y/n): ")
-            if hasil.lower() == "n":
+            if p.kembali_menu() == False:
                 p.loginadmin = False
                 break
             p.bersihkan_layar()
+ 
  
         elif "4." in menu:
             p.bersihkan_layar()
@@ -165,11 +165,11 @@ def menu_admin():
                 print('='*44)
                 print("Gagal! Nama hero tidak ditemukan.")
                 
-            hasil = input("Kembali ke menu? (y/n): ")
-            if hasil.lower() == "n":
+            if p.kembali_menu() == False:
                 p.loginadmin = False
                 break
             p.bersihkan_layar()
+ 
  
         elif "5." in menu:
             p.bersihkan_layar()
@@ -199,8 +199,7 @@ def menu_admin():
             p.tampilkan_hero_filter(pilih_role, pilih_lane)
             print('='*44)
             
-            hasil = input("Kembali ke menu? (y/n): ")
-            if hasil.lower() == "n":
+            if p.kembali_menu() == False:
                 p.loginadmin = False
                 break
             p.bersihkan_layar()
