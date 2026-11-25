@@ -1,6 +1,66 @@
 import inquirer
 import pungsi as p
 
+def menu_favorit():
+    while True:
+        p.bersihkan_layar()
+        print('='*44)
+        print('='*11, 'DAFTAR HERO FAVORIT', '='*12)
+        print('='*44)
+
+        tanya_favorit = [
+            inquirer.List(
+                "pilihan",
+                message="Masukkan Pilihan",
+                choices=[
+                    "1. Melihat Hero Favorit",
+                    "2. Menambah Hero Favorit",
+                    "3. Menghapus Hero Favorit",
+                    "4. Kembali"
+                ],
+            )
+        ]
+        jawab_favorit = inquirer.prompt(tanya_favorit)
+        if jawab_favorit is None:
+            break
+        pilihan = jawab_favorit["pilihan"]
+
+        if "1." in pilihan:
+            p.bersihkan_layar()
+            print('='*14, 'HERO FAVORIT KAMU', '='*14)
+            p.tampilkan_favorit()
+            input("Tekan Enter untuk kembali...")
+
+        elif "2." in pilihan:
+            p.bersihkan_layar()
+            p.tampilkan_seluruh_hero()
+            print('='*44)
+            nama_hero = input("Masukkan Nama Hero yang ingin difavoritkan: ").strip()
+            hasil = p.tambah_favorit(nama_hero)
+            print('='*44)
+            if hasil == "berhasil":
+                print("Hero berhasil ditambahkan ke favorit!")
+            elif hasil == "sudah_ada":
+                print("Hero tersebut sudah ada di daftar favorit!")
+            else:
+                print("Gagal! Nama hero tidak ditemukan.")
+            input("Tekan Enter untuk kembali...")
+
+        elif "3." in pilihan:
+            p.bersihkan_layar()
+            print('='*14, 'HERO FAVORIT KAMU', '='*14)
+            if p.tampilkan_favorit():
+                nama_hero = input("Masukkan Nama Hero yang ingin dihapus dari favorit: ").strip()
+                print('='*44)
+                if p.hapus_favorit(nama_hero):
+                    print("Hero berhasil dihapus dari favorit!")
+                else:
+                    print("Gagal! Hero tersebut tidak ada di daftar favorit.")
+            input("Tekan Enter untuk kembali...")
+
+        else:
+            break
+
 def menu_user():
     while p.loginuser == True:
         p.bersihkan_layar()
@@ -16,8 +76,9 @@ def menu_user():
                     "1. Melihat Daftar Data Hero", 
                     "2. Searching Data Hero", 
                     "3. Bandingkan dan Rekomendasi Hero",
-                    "4. Keluar"
-            ],
+                    "4. Daftar Hero Favorit",
+                    "5. Keluar"
+                ],
             )
         ]
         jawab_menu = inquirer.prompt(tanya_menu)
@@ -80,3 +141,10 @@ def menu_user():
                 p.loginuser = False
                 break
             p.bersihkan_layar()
+
+        elif "4." in menu:
+            menu_favorit()
+
+        else:
+            p.loginuser = False
+            break
