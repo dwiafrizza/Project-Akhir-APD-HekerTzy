@@ -159,6 +159,27 @@ data_hero = {
     127: ["Hirara", "Assassin", "Jungle", "Physical", "2026"]
 }
 
+kesulitan_hero = {
+    4: "Sedang", 5: "Sedang", 10: "Sedang", 13: "Sedang", 17: "Sulit",
+    21: "Sulit", 25: "Sulit", 26: "Sulit", 52: "Sulit", 59: "Sulit",
+    80: "Sulit", 85: "Sulit", 93: "Sulit", 101: "Sulit", 107: "Sulit",
+    112: "Sulit"
+}
+
+def cek_kesulitan(key):
+    if key in kesulitan_hero:
+        return kesulitan_hero[key]
+    return "Sedang"
+
+def angka_kesulitan(teks):
+    if teks == "Mudah":
+        return 1
+    elif teks == "Sedang":
+        return 2
+    else:
+        return 3
+
+
 def bersihkan_layar():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -302,3 +323,64 @@ def tampilkan_favorit():
     tabel.align["Nama Hero"] = "l"
     print(tabel)
     return True
+
+def bandingkan_hero(nama1, nama2):
+    key1 = cari_key_hapus(nama1)
+    key2 = cari_key_hapus(nama2)
+
+    if key1 == False and key2 == False:
+        print("Kedua hero tidak ditemukan!")
+        return
+    if key1 == False:
+        print("Hero", nama1, "tidak ditemukan!")
+        return
+    if key2 == False:
+        print("Hero", nama2, "tidak ditemukan!")
+        return
+    if key1 == key2:
+        print("Pilih dua hero yang berbeda!")
+        return
+
+    hero1 = data_hero[key1]
+    hero2 = data_hero[key2]
+    sulit1 = cek_kesulitan(key1)
+    sulit2 = cek_kesulitan(key2)
+
+    # tabel hero 1
+    tabel1 = PrettyTable()
+    tabel1.field_names = ["Data", hero1[0]]
+    tabel1.add_row(["Role", hero1[1]])
+    tabel1.add_row(["Lane", hero1[2]])
+    tabel1.add_row(["Tipe Damage", hero1[3]])
+    tabel1.add_row(["Tahun Rilis", hero1[4]])
+    tabel1.add_row(["Kesulitan", sulit1])
+
+    # tabel hero 2
+    tabel2 = PrettyTable()
+    tabel2.field_names = ["Data", hero2[0]]
+    tabel2.add_row(["Role", hero2[1]])
+    tabel2.add_row(["Lane", hero2[2]])
+    tabel2.add_row(["Tipe Damage", hero2[3]])
+    tabel2.add_row(["Tahun Rilis", hero2[4]])
+    tabel2.add_row(["Kesulitan", sulit2])
+
+    # dua tabel disejajarkan, dicetak baris per baris
+    baris1 = tabel1.get_string().split("\n")
+    baris2 = tabel2.get_string().split("\n")
+    for i in range(len(baris1)):
+        print(baris1[i] + "   " + baris2[i])
+
+    print()
+    angka1 = angka_kesulitan(sulit1)
+    angka2 = angka_kesulitan(sulit2)
+
+    if angka1 < angka2:
+        print("Yang lebih direkomendasikan untuk pemula adalah", hero1[0])
+        print("Karena kesulitannya", sulit1, "sedangkan", hero2[0], "kesulitannya", sulit2)
+    elif angka2 < angka1:
+        print("Yang lebih direkomendasikan untuk pemula adalah", hero2[0])
+        print("Karena kesulitannya", sulit2, "sedangkan", hero1[0], "kesulitannya", sulit1)
+    else:
+        print("Kedua hero sama-sama tingkat kesulitan", sulit1)
+        print("Jadi bebas pilih salah satu untuk pemula")
+
