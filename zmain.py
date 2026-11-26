@@ -129,7 +129,7 @@ while True:
                 else:
                     print("Akun belum terdaftar!")
                 input("Tekan Enter untuk melanjutkan...")
-                    print("Akun belum terdaftar!")
+                print("Akun belum terdaftar!")
                 input("Tekan Enter untuk melanjutkan...")
 
         if p.loginadmin:
