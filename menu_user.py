@@ -108,12 +108,12 @@ def menu_user():
                     break
                 pilihan = jawab_favorit["pilihan"]
                 if "1." in pilihan:
-                    p.bersihkan_layar()
+                    os.system("cls" if os.name == "nt" else "clear")
                     print('='*14, 'HERO FAVORIT KAMU', '='*14)
                     p.tampilkan_favorit()
                     input("Tekan Enter untuk kembali...")
                 elif "2." in pilihan:
-                    p.bersihkan_layar()
+                    os.system("cls" if os.name == "nt" else "clear")
                     p.tampilkan_seluruh_hero()
                     print('='*44)
                     nama_hero = input("Masukkan Nama Hero yang ingin difavoritkan: ").strip()
@@ -127,7 +127,7 @@ def menu_user():
                         print("Gagal! Nama hero tidak ditemukan.")
                     input("Tekan Enter untuk kembali...")
                 elif "3." in pilihan:
-                    p.bersihkan_layar()
+                    os.system("cls" if os.name == "nt" else "clear")
                     print('='*14, 'HERO FAVORIT KAMU', '='*14)
                     if p.tampilkan_favorit():
                         nama_hero = input("Masukkan Nama Hero yang ingin dihapus dari favorit: ").strip()

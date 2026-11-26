@@ -7,7 +7,7 @@
     [
         "Zaid",
         "3",
-        false
+        true
     ],
     [
         "Chika",
@@ -17,6 +17,11 @@
     [
         "Belva",
         "5",
-        true
+        false
+    ],
+    [
+        "admaja",
+        "300",
+        false
     ]
 ]
