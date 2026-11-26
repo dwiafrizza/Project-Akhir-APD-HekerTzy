@@ -1,93 +1,143 @@
+import os
 import inquirer
 import pungsi as p
- 
-role_valid = ("Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank")
-lane_valid = ("EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane")
-damage_valid = ("Physical", "Magic", "True")
-pilihan_ya = ("y", "ya")
-pilihan_jawab = ("y", "ya", "n", "tidak")
- 
+
 def menu_admin():
-   while p.loginadmin == True:
-        p.bersihkan_layar()
-        print('='*44)
-        print('='*16, 'MENU ADMIN', '='*16)
-        print('='*44)
-        tanya_menu = [
+    while p.loginadmin == True:
+        os.system("cls" if os.name == "nt" else "clear")
+        print("=" * 44)
+        print("=" * 16, "MENU ADMIN", "=" * 16)
+        print("=" * 44)
+        jawab_menu = inquirer.prompt([
             inquirer.List(
                 "pilihan",
                 message="Masukkan pilihan",
                 choices=[
-                    "1. Menambah Data Hero", 
-                    "2. Melihat Daftar Data Hero", 
+                    "1. Menambah Data Hero",
+                    "2. Melihat Daftar Data Hero",
                     "3. Mengedit Data Hero",
-                    "4. Menghapus Data Hero", 
-                    "5. Mencari Data Hero",
-                    "6. Keluar"
+                    "4. Menghapus Data Hero",
+                    "5. Manajemen Akun User",
+                    "6. Keluar",
                 ],
             )
-        ]
-        jawab_menu = inquirer.prompt(tanya_menu)
+        ])
+        if jawab_menu is None:
+            p.loginadmin = False
+            break
         menu = jawab_menu["pilihan"]
-        
-        if "2." in menu:
-            p.bersihkan_layar()
-            p.tampilkan_seluruh_hero()
-            print('='*44)
-            if p.kembali_menu() == False:
-                p.loginadmin = False
-                break
-            p.bersihkan_layar()
- 
- 
-        elif "1." in menu:
-            p.bersihkan_layar()
-            print('='*22, 'TAMBAH DATA HERO', '='*22)
-            print('='*62)
+
+        if "1." in menu:
+            os.system("cls" if os.name == "nt" else "clear")
+            print("=" * 22, "TAMBAH DATA HERO", "=" * 22)
+            print("=" * 62)
             p.tampilkan_seluruh_hero()
             print(f"Jumlah Hero Saat ini adalah {len(p.data_hero)}")
-
-            while True:
+            while True: #akan terus looping smpe ada yg ngehentiin, kyk break
                 nama_input = input("Masukkan Nama Hero: ")
                 if nama_input == "":
                     print("Nama hero tidak boleh kosong!")
                     continue
-                
-                if p.cek_nama_duplikat(nama_input, p.data_hero):
-                    print(f"Gagal! Hero dengan nama '{nama_input}' sudah ada di database.")
+                if p.cari_key_hero(nama_input) != False: #kalau dia ga false kan berarti ada di database
+                    print(f"{nama_input} sudah ada di database. Silahkan masukkan nama lain.")
                 else:
                     break
-            
-            role = input("Masukkan Role Hero: ")
-            lane = input("Masukkan Lane Hero: ")
-            damage = input("Masukkan Tipe Damage: ")
-            
-            try:
-                tahun = int(input("Masukkan Tahun Rilis: "))
-            except ValueError:
-                print("Tahun harus berupa bilangan bulat!")
-                input("Tekan enter untuk kembali...")
-                p.bersihkan_layar()
-                continue
-                
-            nomor_baru = max(p.data_hero.keys()) + 1
-            list_baru = [nama_input, role, lane, damage, str(tahun)]
-            
-            p.tambah_data_hero(nomor_baru, list_baru)
-            print('='*44)
+
+            while True:
+                role = input("Masukkan Role Hero: ")
+                cocok_role = [r for r in p.role_valid if r.lower() == role.lower()]
+                if cocok_role:
+                    role = cocok_role[0]
+                    break
+                print("Input role tidak valid! Pilihan:", p.role_valid)
+
+            while True:
+                lane = input("Masukkan Lane Hero: ")
+                cocok_lane = [l for l in p.lane_valid if l.lower() == lane.lower()]
+                if cocok_lane:
+                    lane = cocok_lane[0]
+                    break
+                print("Input lane tidak valid! Pilihan:", p.lane_valid)
+
+            while True:
+                damage = input("Masukkan Tipe Damage: ")
+                cocok_damage = [d for d in p.damage_valid if d.lower() == damage.lower()]
+                if cocok_damage:
+                    damage = cocok_damage[0]
+                    break
+                print("Input tipe damage tidak valid! Pilihan:", p.damage_valid)
+
+            tahun_terakhir = max((int(v[4]) for v in p.data_hero.values()), default=2016)
+            while True:
+                input_tahun = input(f"Masukkan Tahun Rilis (>= {tahun_terakhir}): ").strip()
+                try:
+                    tahun = int(input_tahun)
+                except ValueError:
+                    print("Tahun harus berupa bilangan bulat!")
+                    continue
+                if tahun < tahun_terakhir:
+                    print(f"Tahun rilis tidak boleh kurang dari tahun rilis hero terakhir ({tahun_terakhir})!")
+                    continue
+                break
+
+            nomor_baru = max(p.data_hero.keys()) + 1 if p.data_hero else 1
+            p.data_hero[nomor_baru] = [nama_input, role, lane, damage, str(tahun)]
+            print("=" * 44)
             print("Data hero berhasil ditambahkan.")
-            if p.kembali_menu() == False:
+
+            jawab_kembali = inquirer.prompt([
+                inquirer.List("kembali", message="Kembali ke menu?", choices=["Ya", "Tidak"])
+            ])
+            if jawab_kembali is None or jawab_kembali["kembali"] == "Tidak":
                 p.loginadmin = False
                 break
-            p.bersihkan_layar()
- 
-            
-        elif "3." in menu: 
-            p.bersihkan_layar()
+
+        elif "2." in menu:
+            while True:
+                os.system("cls" if os.name == "nt" else "clear")
+                p.tampilkan_seluruh_hero()
+                print("=" * 44)
+
+                jawab_aksi = inquirer.prompt([
+                    inquirer.List(
+                        "aksi",
+                        message="Pilih tindakan",
+                        choices=[
+                            "Filter / Cari Hero (Role & Lane)",
+                            "Kembali ke Menu Admin",
+                            "Logout",
+                        ],
+                    )
+                ])
+                if jawab_aksi is None or jawab_aksi["aksi"] == "Kembali ke Menu Admin":
+                    break
+                if jawab_aksi["aksi"] == "Logout":
+                    p.loginadmin = False
+                    break
+
+                jawab_role = inquirer.prompt([
+                    inquirer.List("role", message="Pilih Role Hero", choices=list(p.role_valid) + ["All"])
+                ])
+                if jawab_role is None:
+                    break
+
+                jawab_lane = inquirer.prompt([
+                    inquirer.List("lane", message="Pilih Lane Hero", choices=list(p.lane_valid) + ["All"])
+                ])
+                if jawab_lane is None:
+                    break
+
+                os.system("cls" if os.name == "nt" else "clear")
+                p.tampilkan_hero_filter(jawab_role["role"], jawab_lane["lane"])
+                print("=" * 44)
+                input("Tekan Enter untuk kembali ke daftar hero...")
+
+        elif "3." in menu:
+            os.system("cls" if os.name == "nt" else "clear")
             p.tampilkan_seluruh_hero()
             print('='*44)
             nama_edit = input("Masukkan Nama Hero yang ingin diedit: ")
-            key_target = p.cari_key_hapus(nama_edit)
+            key_target = p.cari_key_hero(nama_edit)
             
             if key_target != False:
                 nama_lama, role_lama, lane_lama, damage_lama, tahun_lama = p.data_hero[key_target]
@@ -97,25 +147,24 @@ def menu_admin():
  
                 nama_baru = input("Nama baru: ")
  
-                role_baru = p.cek_validasi("Role baru: ", role_valid)
-                role_tambah = input("Tambah role kedua? (y/n): ").lower()
-                if role_tambah in pilihan_ya:
-                    role_kedua = p.cek_validasi("Role kedua: ", role_valid)
+                role_baru = p.cek_validasi("Role baru: ", p.role_valid)
+                role_tambah = inquirer.prompt([
+                    inquirer.List("pilihan", message="Tambah role ke-2?", choices=["Ya", "Tidak"])
+                ])
+                if role_tambah["pilihan"] == "Ya":
+                    role_kedua = p.cek_validasi("Role kedua: ", p.role_valid)
                     role_baru = role_baru + "/" + role_kedua
  
-                lane_baru = p.cek_validasi("Lane baru: ", lane_valid)
-                lane_tambah = input("Tambah lane kedua? (y/n): ").lower()
-                if lane_tambah in pilihan_ya:
-                    lane_kedua = p.cek_validasi("Lane kedua: ", lane_valid)
+                lane_baru = p.cek_validasi("Lane baru: ", p.lane_valid)
+                lane_tambah = inquirer.prompt([
+                    inquirer.List("pilihan", message="Tambah role ke-2?", choices=["Ya", "Tidak"])
+                ])
+                if lane_tambah["pilihan"] == "Ya":
+                    lane_kedua = p.cek_validasi("Lane kedua: ", p.lane_valid)
                     lane_baru = lane_baru + "/" + lane_kedua
  
-                damage_baru = p.cek_validasi("Tipe damage baru: ", damage_valid)
-                damage_tambah = input("Tambah tipe damage kedua? (y/n): ").lower()
-                if damage_tambah in pilihan_ya:
-                    damage_kedua = p.cek_validasi("Tipe damage kedua: ", damage_valid)
-                    damage_baru = damage_baru + "/" + damage_kedua
-                
- 
+                damage_baru = p.cek_validasi("Tipe damage baru: ", p.damage_valid)
+                 
                 print(f"Tahun Rilis tetap (tidak dapat diubah): {tahun_lama}")
                 
                 tuple_update = (nama_baru, role_baru, lane_baru, damage_baru, tahun_lama)
@@ -126,32 +175,35 @@ def menu_admin():
             else:
                 print('='*44)
                 print("Gagal! Nama hero tidak ditemukan.")
-                
-            if p.kembali_menu() == False:
+
+            jawab_kembali = inquirer.prompt([
+                inquirer.List("kembali", message="Kembali ke menu?", choices=["Ya", "Tidak"])
+            ])
+            if jawab_kembali is None or jawab_kembali["kembali"] == "Tidak":
                 p.loginadmin = False
                 break
-            p.bersihkan_layar()
- 
- 
+
         elif "4." in menu:
-            p.bersihkan_layar()
+            os.system("cls" if os.name == "nt" else "clear")
             p.tampilkan_seluruh_hero()
             print('='*44)
-            nama_hapus = input("Masukkan Nama Hero yang ingin dihapus (Contoh: Miya): ")
-            key_target = p.cari_key_hapus(nama_hapus)
+            nama_hapus = input("Masukkan Nama Hero yang ingin dihapus: ")
+            key_target = p.cari_key_hero(nama_hapus)
             
             if key_target != False:
                 nama_target, role_target, lane_target, damage_target, tahun_target = p.data_hero[key_target]
                 print('='*44)
-                print("Hero yang dipilih:", nama_target, "|", role_target, "|", lane_target)
-                yakin = p.cek_validasi("Yakin ingin menghapus? (y/n): ", pilihan_jawab)
+                print(f"Hero yang dipilih: {nama_target} | {role_target} | {lane_target} | {damage_target} | {tahun_target}")
+                print('='*44)
+                yakin = inquirer.prompt([
+                inquirer.List("yakin", message="Yakin ingin menghapus?", choices=["Ya", "Tidak"])
+            ])
  
- 
-                if yakin in pilihan_ya:
+                if yakin["yakin"] == "Ya":
                     del p.data_hero[key_target]
                     print('='*44)
                     print("Sukses menghapus data:", nama_target)
-                    
+
                     urut_data = {}
                     key_ulang = 1
                     for key in p.data_hero.keys():
@@ -164,46 +216,56 @@ def menu_admin():
             else:
                 print('='*44)
                 print("Gagal! Nama hero tidak ditemukan.")
-                
-            if p.kembali_menu() == False:
+
+            jawab_kembali = inquirer.prompt([
+                inquirer.List("kembali", message="Kembali ke menu?", choices=["Ya", "Tidak"])
+            ])
+            if jawab_kembali is None or jawab_kembali["kembali"] == "Tidak":
                 p.loginadmin = False
                 break
-            p.bersihkan_layar()
- 
- 
+
         elif "5." in menu:
-            p.bersihkan_layar()
-            print('='*22, 'CARI DATA HERO', '='*22)
-            
-            tanya_role = [
-                inquirer.List(
-                    "role",
-                    message="Pilih Role Hero",
-                    choices= list(role_valid) + ["All"],
-                )
-            ]
-            jawab_role = inquirer.prompt(tanya_role)
-            pilih_role = jawab_role["role"]
-            
-            tanya_lane = [
-                inquirer.List(
-                    "lane",
-                    message="Pilih Lane Hero",
-                    choices=list(lane_valid) + ["All"],
-                )
-            ]
-            jawab_lane = inquirer.prompt(tanya_lane)
-            pilih_lane = jawab_lane["lane"]
-            
-            p.bersihkan_layar()
-            p.tampilkan_hero_filter(pilih_role, pilih_lane)
-            print('='*44)
-            
-            if p.kembali_menu() == False:
-                p.loginadmin = False
-                break
-            p.bersihkan_layar()
- 
+            while True:
+                os.system("cls" if os.name == "nt" else "clear")
+                print("=" * 14, "MANAJEMEN AKUN USER", "=" * 14)
+                if len(p.data_akun) == 0:
+                    print("Belum ada akun user terdaftar.")
+                    input("Tekan Enter untuk kembali...")
+                    break
+                p.tampilkan_akun_pandas()
+                print()
+                jawab_aksi_akun = inquirer.prompt([
+                    inquirer.List(
+                        "aksi",
+                        message="Pilih tindakan akun",
+                        choices=["Ban Akun User", "Unban Akun User", "Kembali"],
+                    )
+                ])
+                if jawab_aksi_akun is None or jawab_aksi_akun["aksi"] == "Kembali":
+                    break
+                target_usn = input("Masukkan Username target: ")
+                ditemukan = False
+                for akun in p.data_akun:
+                    if akun[0] == target_usn:
+                        ditemukan = True
+                        if len(akun) < 3:
+                            akun.append(False)
+
+                        if jawab_aksi_akun["aksi"] == "Ban Akun User":
+                            akun[2] = True
+                            p.simpan_data_akun(p.data_akun)
+                            print(f"Akun '{akun[0]}' berhasil di-BAN.")
+                        elif jawab_aksi_akun["aksi"] == "Unban Akun User":
+                            akun[2] = False
+                            p.simpan_data_akun(p.data_akun)
+                            print(f"Akun '{akun[0]}' berhasil di-UNBAN.")
+                        break
+
+                if not ditemukan:
+                    print("Username tidak ditemukan!")
+                input("Tekan Enter untuk melanjutkan...")
+
+        # 6.Keluar
         else:
             p.loginadmin = False
             break

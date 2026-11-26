@@ -1,24 +1,23 @@
 import os
-import random
+import json
 import inquirer
-from prettytable import PrettyTable 
-login = False
+import pandas as pd
+from prettytable import PrettyTable
+
+FILE_AKUN = "data_akun.json"
+
 loginuser = False
 loginadmin = False
 
 daftar_admin = [
     ["Rizki", "007"],
     ["Surya", "002"],
-    ["Rizal", "001"]
+    ["Rizal", "001"],
 ]
 
-username = 'Rizki' 
-password = '123'   
-
-current_role = None
 role_valid = ("Fighter", "Marksman", "Assassin", "Mage", "Support", "Tank")
 lane_valid = ("EXP Lane", "Gold Lane", "Jungle", "Roam", "Mid Lane")
-damage_valid = ("Physical", "Magic", "True")
+damage_valid = ("Physical", "Magic")
 
 data_hero = {
     1: ["Miya", "Marksman", "Gold Lane", "Physical", "2016"],
@@ -31,7 +30,7 @@ data_hero = {
     8: ["Karina", "Assassin", "Jungle", "Magic", "2016"],
     9: ["Akai", "Tank", "Roam/Jungle", "Physical", "2016"],
     10: ["Franco", "Tank/Support", "Roam", "Physical", "2016"],
-    11: ["Bane", "Fighter/Mage", "EXP Lane/Jungle", "Physical/Magic", "2016"],
+    11: ["Bane", "Fighter/Mage", "EXP Lane/Jungle", "Physical", "2016"],
     12: ["Bruno", "Marksman", "Gold Lane", "Physical", "2016"],
     13: ["Clint", "Marksman", "Gold Lane", "Physical", "2016"],
     14: ["Rafaela", "Support", "Roam", "Magic", "2016"],
@@ -56,7 +55,7 @@ data_hero = {
     33: ["Lapu-Lapu", "Fighter", "EXP Lane", "Physical", "2017"],
     34: ["Vexana", "Mage", "Mid Lane", "Magic", "2017"],
     35: ["Roger", "Fighter/Marksman", "Jungle", "Physical", "2017"],
-    36: ["Karrie", "Marksman", "Gold Lane", "Physical/True", "2017"],
+    36: ["Karrie", "Marksman", "Gold Lane", "Physical", "2017"],
     37: ["Gatotkaca", "Tank/Fighter", "EXP Lane/Roam", "Magic", "2017"],
     38: ["Harley", "Assassin/Mage", "Jungle", "Magic", "2017"],
     39: ["Irithel", "Marksman", "Gold Lane", "Physical", "2017"],
@@ -69,7 +68,7 @@ data_hero = {
     46: ["Zhask", "Mage", "Mid Lane", "Magic", "2017"],
     47: ["Helcurt", "Assassin", "Jungle/Roam", "Physical", "2017"],
     48: ["Pharsa", "Mage", "Mid Lane", "Magic", "2018"],
-    49: ["Lesley", "Marksman/Assassin", "Gold Lane", "Physical/True", "2018"],
+    49: ["Lesley", "Marksman/Assassin", "Gold Lane", "Physical", "2018"],
     50: ["Jawhead", "Fighter", "EXP Lane/Roam", "Physical", "2018"],
     51: ["Angela", "Support", "Roam", "Magic", "2018"],
     52: ["Gusion", "Assassin", "Jungle", "Magic", "2018"],
@@ -87,7 +86,7 @@ data_hero = {
     64: ["Lunox", "Mage", "Mid Lane", "Magic", "2018"],
     65: ["Hanzo", "Assassin", "Jungle", "Physical", "2018"],
     66: ["Belerick", "Tank", "Roam", "Magic", "2018"],
-    67: ["Kimmy", "Marksman/Mage", "Gold Lane", "Physical/Magic", "2018"],
+    67: ["Kimmy", "Marksman/Mage", "Gold Lane", "Magic", "2018"],
     68: ["Thamuz", "Fighter", "EXP Lane/Jungle", "Physical", "2018"],
     69: ["Harith", "Mage", "Gold Lane/Mid Lane", "Magic", "2018"],
     70: ["Minsitthar", "Fighter", "EXP Lane", "Physical", "2018"],
@@ -99,7 +98,7 @@ data_hero = {
     76: ["Guinevere", "Fighter", "EXP Lane", "Magic", "2019"],
     77: ["Esmeralda", "Tank/Mage", "EXP Lane", "Magic", "2019"],
     78: ["Terizla", "Fighter", "EXP Lane", "Physical", "2019"],
-    79: ["X.Borg", "Fighter", "EXP Lane", "True/Physical", "2019"],
+    79: ["X.Borg", "Fighter", "EXP Lane", "Physical", "2019"],
     80: ["Ling", "Assassin", "Jungle", "Physical", "2019"],
     81: ["Dyrroth", "Fighter", "EXP Lane/Jungle", "Physical", "2019"],
     82: ["Lylia", "Mage", "Mid Lane", "Magic", "2019"],
@@ -147,7 +146,7 @@ data_hero = {
     124: ["Obsidia", "Marksman", "Gold Lane", "Physical", "2025"],
     125: ["Sora", "Fighter/Assassin", "EXP Lane/Jungle", "Physical", "2025"],
     126: ["Marcel", "Support", "Roam", "Magic", "2025"],
-    127: ["Hirara", "Assassin", "Jungle", "Physical", "2026"]
+    127: ["Hirara", "Assassin", "Jungle", "Physical", "2026"],
 }
 
 kesulitan_hero = {
@@ -156,46 +155,43 @@ kesulitan_hero = {
     80: "Sulit", 85: "Sulit", 93: "Sulit", 101: "Sulit", 107: "Sulit",
     112: "Sulit"
 }
+####################################################################################################################
+#..general
+def cari_key_hero(nama_target):
+    target = nama_target.strip().lower()
+    for key, value in data_hero.items():
+        if value[0].lower() == target:
+            return key
+    return False
+###################################################################################################################
+#..json akun handling
+def muat_data_akun():
+    try:
+        with open(FILE_AKUN, "r", encoding="utf-8") as file:
+            data = json.load(file)
+            return data if isinstance(data, list) else []
+    except FileNotFoundError:
+        return []
 
-def cek_kesulitan(key):
-    if key in kesulitan_hero:
-        return kesulitan_hero[key]
-    return "Sedang"
-
-def angka_kesulitan(teks):
-    if teks == "Mudah":
-        return 1
-    elif teks == "Sedang":
-        return 2
-    else:
-        return 3
-
-
-def bersihkan_layar():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-def cek_validasi(pesan, daftar_valid):
-    while True:
-        inputan = input(pesan).strip()
-        for pilihan in daftar_valid:
-            if inputan.lower() == pilihan.lower():
-                return pilihan
-        print("Input tidak valid! Pilihan:", daftar_valid)
-
-def kembali_menu():
-    tanya = [
-        inquirer.List(
-            "kembali",
-            message="Kembali ke menu?",
-            choices=["Ya", "Tidak"],
-        )
-    ]
-    jawab = inquirer.prompt(tanya)
-    if jawab["kembali"] == "Ya":
-        return True
-    else:
-        return False
-
+def simpan_data_akun(data):
+    with open(FILE_AKUN, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+###################################################################################################################
+#..MANAJEMEN AKUN USER
+data_akun = muat_data_akun()
+def tampilkan_akun_pandas():
+    baris = []
+    for akun in data_akun:
+        status_ban = "BANNED" if akun[2] == True else "AKTIF"
+        baris.append({
+            "Username": akun[0],
+            "Password": akun[1],
+            "Status": status_ban,
+        })
+    df = pd.DataFrame(baris)
+    print(df)
+###################################################################################################################
+#..MELIHAT DAFTAR DATA HERO
 def tampilkan_seluruh_hero():
     tabel = PrettyTable()
     tabel.field_names = ["No", "Nama Hero", "Role", "Lane", "Tipe Damage", "Tahun Rilis"]
@@ -203,102 +199,102 @@ def tampilkan_seluruh_hero():
         tabel.add_row([key, value[0], value[1], value[2], value[3], value[4]])
     tabel.align["Nama Hero"] = "l"
     print(tabel)
-
-def buat_set_username():
-    set_usn = set()
-    # Masukkan admin
-    for adm in daftar_admin:
-        set_usn.add(adm[0].lower())
-    # Masukkan user biasa yang aktif saat ini
-    if username:
-        set_usn.add(username.lower())
-    return set_usn
-
-def cek_username_duplikat(new_user):
-    existing_set = buat_set_username()
-    if new_user.strip().lower() in existing_set:
-        return True
-    return False
-
-def buat_set_nama(data_hero):
-    set_nama = set()
-    for value in data_hero.values():
-        set_nama.add(value[0].lower())
-    return set_nama
-
-def cek_nama_duplikat(nama_baru, data_hero):
-    set_nama = buat_set_nama(data_hero)
-    if nama_baru.strip().lower() in set_nama:
-        return True
-    return False
-
-def filter_hero(role, lane, data_hero):
-    hasil = set(data_hero.keys())
-
-    if role != "All":
-        role_cocok = set()
-        for key, value in data_hero.items():
-            if role in value[1]:
-                role_cocok.add(key)
-        hasil = hasil.intersection(role_cocok)
-
-    if lane != "All":
-        lane_cocok = set()
-        for key, value in data_hero.items():
-            if lane in value[2]:
-                lane_cocok.add(key)
-        hasil = hasil.intersection(lane_cocok)
-
-    return hasil
-
+####################################################################################################################
+#..SEARCHING HERO
 def tampilkan_hero_filter(role_filter, lane_filter):
-    hasil_key = filter_hero(role_filter, lane_filter, data_hero)
+    hasil = []
+    for key, value in data_hero.items():
+        cocok_role = (role_filter == "All") or (role_filter in value[1])
+        cocok_lane = (lane_filter == "All") or (lane_filter in value[2])
+        if cocok_role and cocok_lane:
+            hasil.append((key, value))
+    if len(hasil) == 0:
+        print("Tidak ada hero yang ditemukan sesuai filter tersebut!")
+        return
     tabel = PrettyTable()
     tabel.field_names = ["No", "Nama Hero", "Role", "Lane", "Tipe Damage", "Tahun Rilis"]
-    if len(hasil_key) == 0:
-        print("Tidak ada hero yang ditemukan sesuai filter tersebut!")
-    else:
-        for key in sorted(hasil_key):
-            tabel.add_row([key, data_hero[key][0], data_hero[key][1], data_hero[key][2], data_hero[key][3], data_hero[key][4]])
-        tabel.align["Nama Hero"] = "l"
-        print(tabel)
+    for key, value in hasil:
+        tabel.add_row([key, value[0], value[1], value[2], value[3], value[4]])
+    tabel.align["Nama Hero"] = "l"
+    print(tabel)
+###################################################################################################################
+#..PILIH HERO FAVORIT
+hero_favorit = {}
+akun_login = "" 
+def ambil_favorit():
+    if akun_login not in hero_favorit:
+        hero_favorit[akun_login] = []
+    return hero_favorit[akun_login]
 
-def tambah_data_hero(nomor, data_baru):
-    data_hero[nomor] = data_baru
+def tambah_favorit(nama_hero):
+    key = cari_key_hero(nama_hero)
+    if key is False:
+        return "tidak_ada"
+    nama_asli = data_hero[key][0]
+    favorit = ambil_favorit()
+    if nama_asli in favorit:
+        return "sudah_ada"
+    favorit.append(nama_asli)
+    return "berhasil"
 
-def cari_key_hapus(nama_target):
-    for key, value in data_hero.items():
-        if nama_target.lower() == value[0].lower():
-            return key
+def hapus_favorit(nama_hero):
+    favorit = ambil_favorit()
+    nama_cari = nama_hero
+    if nama_cari in favorit:
+        favorit.remove(nama_cari)
+        return True
     return False
 
-def edit_data_hero(key, data_update):
-    data_hero[key] = tuple(data_update)
+def tampilkan_favorit():
+    favorit = ambil_favorit()
+    tabel = PrettyTable()
+    tabel.field_names = ["No", "Nama Hero", "Role", "Lane", "Tipe Damage", "Tahun Rilis"]
+    nomor = 1
+    for value in data_hero.values():
+        if value[0] in favorit:
+            tabel.add_row([nomor, value[0], value[1], value[2], value[3], value[4]])
+            nomor += 1
+    if nomor == 1:
+        print("Daftar hero favorit masih kosong.")
+        return False
+    tabel.align["Nama Hero"] = "l"
+    print(tabel)
     return True
+##################################################################################################################
+#..komparasi hero
+def cek_kesulitan(key):
+    if key in kesulitan_hero:
+        return kesulitan_hero[key]
+    return "Mudah"
+
+def angka_kesulitan(teks):
+    if teks == "Mudah":
+        return 1
+    if teks == "Sedang":
+        return 2
+    return 3
 
 def bandingkan_hero(nama1, nama2):
-    key1 = cari_key_hapus(nama1)
-    key2 = cari_key_hapus(nama2)
+    key1 = cari_key_hero(nama1)
+    key2 = cari_key_hero(nama2)
 
-    if key1 == False and key2 == False:
+    if key1 is False and key2 is False:
         print("Kedua hero tidak ditemukan!")
         return
-    if key1 == False:
-        print("Hero", nama1, "tidak ditemukan!")
+    elif key1 is False:
+        print(f"Hero '{nama1}' tidak ditemukan!")
         return
-    if key2 == False:
-        print("Hero", nama2, "tidak ditemukan!")
+    elif key2 is False:
+        print(f"Hero '{nama2}' tidak ditemukan!")
         return
-    if key1 == key2:
+    elif key1 == key2:
         print("Pilih dua hero yang berbeda!")
         return
-
+    
     hero1 = data_hero[key1]
     hero2 = data_hero[key2]
     sulit1 = cek_kesulitan(key1)
     sulit2 = cek_kesulitan(key2)
-
-    # tabel hero 1
     tabel1 = PrettyTable()
     tabel1.field_names = ["Data", hero1[0]]
     tabel1.add_row(["Role", hero1[1]])
@@ -307,7 +303,6 @@ def bandingkan_hero(nama1, nama2):
     tabel1.add_row(["Tahun Rilis", hero1[4]])
     tabel1.add_row(["Kesulitan", sulit1])
 
-    # tabel hero 2
     tabel2 = PrettyTable()
     tabel2.field_names = ["Data", hero2[0]]
     tabel2.add_row(["Role", hero2[1]])
@@ -316,23 +311,157 @@ def bandingkan_hero(nama1, nama2):
     tabel2.add_row(["Tahun Rilis", hero2[4]])
     tabel2.add_row(["Kesulitan", sulit2])
 
-    # dua tabel disejajarkan, dicetak baris per baris
     baris1 = tabel1.get_string().split("\n")
     baris2 = tabel2.get_string().split("\n")
     for i in range(len(baris1)):
         print(baris1[i] + "   " + baris2[i])
-
+        
     print()
     angka1 = angka_kesulitan(sulit1)
     angka2 = angka_kesulitan(sulit2)
-
     if angka1 < angka2:
-        print("Yang lebih direkomendasikan untuk pemula adalah", hero1[0])
-        print("Karena kesulitannya", sulit1, "sedangkan", hero2[0], "kesulitannya", sulit2)
+        print(f"Direkomendasikan untuk pemula: {hero1[0]} (kesulitan {sulit1} vs {hero2[0]} yang {sulit2}).")
     elif angka2 < angka1:
-        print("Yang lebih direkomendasikan untuk pemula adalah", hero2[0])
-        print("Karena kesulitannya", sulit2, "sedangkan", hero1[0], "kesulitannya", sulit1)
+        print(f"Direkomendasikan untuk pemula: {hero2[0]} (kesulitan {sulit2} vs {hero1[0]} yang {sulit1}).")
     else:
-        print("Kedua hero sama-sama tingkat kesulitan", sulit1)
-        print("Jadi bebas pilih salah satu untuk pemula")
+        print(f"Keduanya sama-sama memiliki tingkat kesulitan {sulit1}, cocok dicoba sesuai preferensi.")
 
+##################################################################################################################
+#..CEK KOMPOSISI TIM (DRAFT PICK)
+def tampilkan_daftar_per_role_horizontal(hero_terpakai):
+    data = {}
+
+    for role in role_valid:
+        hero = []
+        for key, value in data_hero.items():
+            if role in value[1].split("/") and key not in hero_terpakai:
+                hero.append(value[0])
+        data[role] = pd.Series(hero)
+
+    df = pd.DataFrame(data).fillna("")
+    print(df)
+
+def lane_sesuai_hero(lane_pilih, hero_info):
+    lane_asli = [lane.strip().lower() for lane in hero_info[2].split("/")]
+    return lane_pilih.lower() in lane_asli
+
+def rekomendasi_lane_hero(hero_info):
+    lane_asli = [lane.strip() for lane in hero_info[2].split("/")]
+    return lane_asli[0]
+
+def cek_komposisi_draft():
+    tim = []
+    hero_terpakai = set()
+    print("=" * 14, "DRAFT PICK", "=" * 14)
+    for slot in range(1, 6):
+        print()
+        print(f"--- Pick ke-{slot} dari 5 ---")
+        jawab_lane = inquirer.prompt([
+            inquirer.List("lane", message=f"Pilih Lane ke-{slot}", choices=list(lane_valid))
+        ])
+        if jawab_lane is None:
+            return #biar ga error pas ctrl+c
+        lane_pilih = jawab_lane["lane"]
+        tampilkan_daftar_per_role_horizontal(hero_terpakai)
+        while True:
+            nama_input = input(f"Masukkan nama hero untuk {lane_pilih}: ").strip()
+            key_hero = cari_key_hero(nama_input)
+            if key_hero is False:
+                print("Nama hero tidak ditemukan, coba lagi.")
+                continue
+            if key_hero in hero_terpakai:
+                print(f"{data_hero[key_hero][0]} sudah dipilih di pick sebelumnya.")
+                continue
+            break
+        hero_terpakai.add(key_hero)
+        info_hero = data_hero[key_hero]
+        tim.append({
+            "key": key_hero,
+            "nama": info_hero[0],
+            "role_hero": info_hero[1],
+            "lane_hero": info_hero[2],
+            "damage": info_hero[3],
+            "lane_pilih": lane_pilih,
+        })
+    tabel = PrettyTable()
+    tabel.field_names = ["Pick", "Hero", "Role Hero", "Lane Dipilih", "Lane Hero", "Damage", "Status Lane"]
+    peta_lane = {lane: [] for lane in lane_valid}
+    jml_physical = 0
+    jml_magic = 0
+    semua_lane_cocok = True
+
+    for idx, item in enumerate(tim, start=1):
+        peta_lane[item["lane_pilih"]].append(item["nama"])
+        cocok_lane = lane_sesuai_hero(item["lane_pilih"], data_hero[item["key"]])
+        rekom_lane = rekomendasi_lane_hero(data_hero[item["key"]])
+        if not cocok_lane:
+            semua_lane_cocok = False
+
+        if item["damage"] == "Physical":
+            jml_physical += 1
+        elif item["damage"] == "Magic":
+            jml_magic += 1
+        status_lane = "Sesuai" if cocok_lane else f"Saran -> {rekom_lane}"
+        tabel.add_row([
+            idx,
+            item["nama"],
+            item["role_hero"],
+            item["lane_pilih"],
+            item["lane_hero"],
+            item["damage"],
+            status_lane,
+        ])
+    print()
+    print("=== HASIL DRAFT TIM ===")
+    print(tabel)
+    
+    print()
+    print("=== VALIDASI LANE===")
+    ada_tabrakan = False
+    for lane, daftar_nama in peta_lane.items():
+        if len(daftar_nama) == 0:
+            print(f"- {lane}: KOSONG (belum ada hero)")
+        elif len(daftar_nama) == 1:
+            print(f"- {lane}: {daftar_nama[0]} (Aman)")
+        else:
+            ada_tabrakan = True
+            print(f"- {lane}: {' dan '.join(daftar_nama)} tidak seharusnya di satu lane yang sama.")
+    
+    print()
+    print("=== VALIDASI KESESUAIAN LANE DENGAN ROLE ===")
+    ada_saran_lane = False
+    for item in tim:
+        if not lane_sesuai_hero(item["lane_pilih"], data_hero[item["key"]]):
+            ada_saran_lane = True
+            rekom_lane = rekomendasi_lane_hero(data_hero[item["key"]])
+            print(f"- {item['nama']} ditaruh di {item['lane_pilih']}; disarankan ke {rekom_lane}.")
+    if not ada_saran_lane:
+        print("- Semua hero berada di lane yang tepat.")
+    
+    print()
+    print("=== VALIDASI KESEIMBANGAN DAMAGE ===")
+    damage_seimbang = (jml_physical == 3 and jml_magic == 2) or (jml_physical == 2 and jml_magic == 3)
+    print(f"Jumlah Physical: {jml_physical} | Jumlah Magic: {jml_magic}")
+    if damage_seimbang:
+        print("Status Damage: SEIMBANG (3:2).")
+    else:
+        print("Status Damage: BELUM SEIMBANG (target komposisi 3 Physical / 2 Magic atau sebaliknya).")
+
+    print()
+    print("=== KESIMPULAN KOMPOSISI ===")
+    if not ada_tabrakan and semua_lane_cocok and damage_seimbang:
+        print("Komposisi tim sudah seimbang, saatnya bantai para poke.")
+    else:
+        print("Komposisi tim masih perlu penyesuaian sesuai catatan di atas.")
+###############################################################################################################
+def cek_validasi(pesan, daftar_valid):
+    while True:
+        inputan = input(pesan).strip()
+        for pilihan in daftar_valid:
+            if inputan.lower() == pilihan.lower():
+                return pilihan
+        print("Input tidak valid! Pilihan:", daftar_valid)
+
+def edit_data_hero(key, data_update):
+    data_hero[key] = tuple(data_update)
+    return True
