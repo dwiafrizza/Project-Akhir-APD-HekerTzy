@@ -119,6 +119,7 @@ while True:
             if login == True:
                 print("Login berhasil!")
                 input("Tekan Enter untuk melanjutkan...")
+                input("Tekan Enter untuk melanjutkan...")
             else:
                 percobaan += 1
                 if akun_dibanned == True:
@@ -126,6 +127,8 @@ while True:
                 elif username_ada == True:
                     print("Password salah!")
                 else:
+                    print("Akun belum terdaftar!")
+                input("Tekan Enter untuk melanjutkan...")
                     print("Akun belum terdaftar!")
                 input("Tekan Enter untuk melanjutkan...")
 

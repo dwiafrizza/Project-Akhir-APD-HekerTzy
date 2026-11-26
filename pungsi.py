@@ -150,12 +150,10 @@ data_hero = {
 }
 
 kesulitan_hero = {
-    1: "Mudah", 2: "Mudah", 3: "Mudah", 4: "Sedang", 5: "Sedang",
-    6: "Mudah", 7: "Mudah", 8: "Mudah", 9: "Mudah", 10: "Sedang",
-    12: "Mudah", 13: "Sedang", 14: "Mudah", 15: "Mudah", 16: "Mudah",
-    17: "Sulit", 18: "Mudah", 21: "Sulit", 25: "Sulit", 26: "Sulit",
-    30: "Mudah", 52: "Sulit", 59: "Sulit", 80: "Sulit", 85: "Sulit",
-    93: "Sulit", 101: "Sulit", 107: "Sulit", 112: "Sulit",
+    4: "Sedang", 5: "Sedang", 10: "Sedang", 13: "Sedang", 17: "Sulit",
+    21: "Sulit", 25: "Sulit", 26: "Sulit", 52: "Sulit", 59: "Sulit",
+    80: "Sulit", 85: "Sulit", 93: "Sulit", 101: "Sulit", 107: "Sulit",
+    112: "Sulit"
 }
 ####################################################################################################################
 #..general
@@ -265,7 +263,9 @@ def tampilkan_favorit():
 ##################################################################################################################
 #..komparasi hero
 def cek_kesulitan(key):
-    return kesulitan_hero.get(key, "Sedang")
+    if key in kesulitan_hero:
+        return kesulitan_hero[key]
+    return "Mudah"
 
 def angka_kesulitan(teks):
     if teks == "Mudah":
